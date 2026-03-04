@@ -1,0 +1,85 @@
+---
+interface Props {
+  value: string;
+  label: string;
+  sub?: string;
+  variant?: 'critical' | 'warning' | 'ok' | 'blue';
+}
+const { value, label, sub, variant = 'blue' } = Astro.props;
+---
+
+<div class={`kpi-card kpi-${variant}`}>
+  <div class="kpi-value">{value}</div>
+  <div class="kpi-label">{label}</div>
+  {sub && <div class="kpi-sub">{sub}</div>}
+</div>
+
+<style>
+  .kpi-card {
+    background: white;
+    border: 2px solid #e0e0e0;
+    border-radius: var(--border-radius-base);
+    padding: 1.5rem;
+    text-align: center;
+    transition: all 0.3s ease;
+  }
+
+  .kpi-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  .kpi-value {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+  }
+
+  .kpi-label {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+
+  .kpi-sub {
+    font-size: 0.875rem;
+    color: #666;
+  }
+
+  /* Variants */
+  .kpi-blue {
+    border-color: var(--color-primary-blue);
+    background: linear-gradient(135deg, rgba(0, 83, 154, 0.05) 0%, rgba(0, 150, 210, 0.05) 100%);
+  }
+
+  .kpi-blue .kpi-value {
+    color: var(--color-primary-blue);
+  }
+
+  .kpi-critical {
+    border-color: #d32f2f;
+    background: linear-gradient(135deg, rgba(211, 47, 47, 0.05) 0%, rgba(230, 124, 115, 0.05) 100%);
+  }
+
+  .kpi-critical .kpi-value {
+    color: #d32f2f;
+  }
+
+  .kpi-warning {
+    border-color: #f57c00;
+    background: linear-gradient(135deg, rgba(245, 124, 0, 0.05) 0%, rgba(255, 167, 38, 0.05) 100%);
+  }
+
+  .kpi-warning .kpi-value {
+    color: #f57c00;
+  }
+
+  .kpi-ok {
+    border-color: #388e3c;
+    background: linear-gradient(135deg, rgba(56, 142, 60, 0.05) 0%, rgba(129, 199, 132, 0.05) 100%);
+  }
+
+  .kpi-ok .kpi-value {
+    color: #388e3c;
+  }
+</style>

@@ -1,0 +1,28 @@
+name: Content Validation
+
+on:
+  pull_request:
+    paths:
+      - 'src/content/**'
+      - 'src/components/**'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Validate frontmatter
+        run: npm run validate:frontmatter
+
+      - name: Build site (validates MDX)
+        run: npm run build

@@ -1,0 +1,81 @@
+---
+interface Props {
+  badge?: string;
+  title: string;
+  subtitle?: string;
+  meta?: Array<{ label: string; value: string }>;
+}
+const { badge, title, subtitle, meta = [] } = Astro.props;
+---
+
+<div class="header">
+  <div class="header-inner">
+    {badge && <div class="header-badge">{badge}</div>}
+    <h1>{title}</h1>
+    {subtitle && <div class="header-subtitle">{subtitle}</div>}
+    {meta.length > 0 && (
+      <div class="header-meta">
+        {meta.map(m => (
+          <span><strong>{m.label}:</strong> {m.value}</span>
+        ))}
+      </div>
+    )}
+  </div>
+</div>
+
+<style>
+  .header {
+    background: linear-gradient(135deg, var(--color-primary-blue) 0%, var(--color-accent-blue) 100%);
+    color: white;
+    padding: 3rem 2rem;
+    border-radius: var(--border-radius-base);
+    margin-bottom: 2rem;
+  }
+
+  .header-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .header-badge {
+    display: inline-block;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 0.4rem 0.8rem;
+    border-radius: var(--border-radius-base);
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+  }
+
+  h1 {
+    margin: 0;
+    font-size: 2.5rem;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+
+  .header-subtitle {
+    font-size: 1.125rem;
+    margin-top: 0.5rem;
+    opacity: 0.95;
+  }
+
+  .header-meta {
+    display: flex;
+    gap: 2rem;
+    margin-top: 1.5rem;
+    font-size: 0.95rem;
+    flex-wrap: wrap;
+  }
+
+  .header-meta span {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .header-meta strong {
+    font-weight: 600;
+    opacity: 0.9;
+  }
+</style>

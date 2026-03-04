@@ -1,0 +1,36 @@
+{
+  "name": "qoa-einstein",
+  "type": "module",
+  "version": "2.0.0",
+  "description": "Portal QOA - Qualidade, Observabilidade e Arquitetura - Hospital Israelita Albert Einstein",
+  "private": true,
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build && npx pagefind --site dist",
+    "preview": "astro preview",
+    "test": "node --experimental-vm-modules node_modules/.bin/jest --config config/jest.config.cjs",
+    "lint:markdown": "markdownlint 'src/content/**/*.mdx' --config .markdownlint.json",
+    "validate:frontmatter": "node scripts/validate-frontmatter.js",
+    "new": "node scripts/new-content.js",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@astrojs/mdx": "^4.0.0",
+    "@astrojs/sitemap": "^3.2.0",
+    "astro": "^5.0.0"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "markdownlint-cli": "^0.47.0",
+    "pagefind": "^1.1.0"
+  },
+  "overrides": {
+    "markdownlint-cli": {
+      "minimatch": "^10.2.4"
+    }
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  }
+}

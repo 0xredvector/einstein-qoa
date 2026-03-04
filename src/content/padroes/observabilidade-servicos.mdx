@@ -1,0 +1,120 @@
+---
+title: "Padrão de Observabilidade para Serviços"
+description: "Requisitos e práticas recomendadas para instrumentação, monitoramento e observabilidade de serviços"
+date: 2026-01-15
+updated: 2026-02-20
+type: "standard"
+category: "observabilidade"
+tags: ["observabilidade", "monitoramento", "logging", "tracing", "metricas"]
+status: "published"
+author: "Time de Observabilidade"
+version: "2.0"
+maturityLevel: 4
+---
+
+## Visão Geral
+
+O padrão de observabilidade define os requisitos mínimos para que qualquer serviço da organização Einstein possa ser adequadamente monitorado, diagnosticado e gerenciado em ambiente de produção. Observabilidade é construída sobre três pilares: logs, métricas e traces distribuídos.
+
+## Os Três Pilares da Observabilidade
+
+### Logs Estruturados
+
+Logs estruturados são essenciais para entender o comportamento do sistema. Cada serviço deve produzir logs em formato JSON com os seguintes campos obrigatórios:
+
+- **timestamp**: Data/hora ISO 8601 UTC
+- **level**: INFO, WARN, ERROR, DEBUG
+- **service**: Nome identificador do serviço
+- **message**: Descrição clara e concisa do evento
+- **trace_id**: Identificador único para correlação com requests
+- **span_id**: Identificador para operação específica
+- **context**: Campos adicionais relevantes ao evento
+
+Logs de erro devem incluir stack traces completos. A retenção mínima é de 30 dias para logs em produção.
+
+### Métricas
+
+Cada serviço deve expor métricas no formato Prometheus em endpoint `/metrics`. Métricas obrigatórias incluem:
+
+- Latência de requisições (histograma com percentis: p50, p95, p99)
+- Taxa de requisições (counter total e por status code)
+- Erros de aplicação (counter de exceções)
+- Taxa de utilização de CPU e memória
+- Conexões de banco de dados (ativas, em espera, erro)
+- Cache hit rate (se aplicável)
+
+Cada métrica deve ter labels para segmentação: service, environment, endpoint, method.
+
+### Traces Distribuídos
+
+Todos os serviços devem instrumentar chamadas entre serviços usando padrão OpenTelemetry. Cada request deve gerar um trace único contendo:
+
+- Span de entrada no serviço (request HTTP/gRPC)
+- Spans de chamadas downstream (banco de dados, APIs externas)
+- Span de processamento de negócio
+- Span de resposta
+
+Traces devem incluir bagagem contextual: user_id, session_id, tenant_id, para correlação multi-serviço.
+
+## SLIs e SLOs
+
+Cada serviço deve definir explicitamente seus indicadores de nível de serviço (SLI):
+
+```
+Disponibilidade: Percentage de requests não-erro / total de requests
+Latência: P99 latency em ms para endpoint crítico
+Taxa de Erro: Percentage de 5xx ou erros de negócio
+```
+
+SLOs (Service Level Objectives) são metas de negócio para SLIs. Exemplo:
+
+```
+SLO: 99.9% disponibilidade mensal
+SLO: P99 latência < 200ms
+SLO: Taxa de erro < 0.1%
+```
+
+Desvios em SLOs (error budgets) devem gerar incidentes para análise de causa raiz.
+
+## Alertas
+
+Alertas devem ser configurados para:
+
+- Taxa de erro acima de 0.5% por 5 minutos
+- Latência P95 acima de 300% da média histórica
+- Utilização de CPU acima de 80% por 10 minutos
+- Falhas em health checks por 2 minutos
+- Degradação de taxa de requisições > 50%
+
+Alertas devem ter escalation automática e definir runbooks para remedição rápida.
+
+## Dashboards
+
+Cada serviço deve manter um dashboard que mostre:
+
+- Taxa de requisições, latência (p50, p95, p99) e taxa de erro
+- Saúde de dependências (bancos, caches, serviços externos)
+- Distribuição de requests por endpoint e método
+- Utilização de recursos (CPU, memória, disco)
+- Status de deploys recentes
+
+Dashboards devem ser versionados junto com código e atualizados quando métricas mudam.
+
+## Implementação
+
+A instrumentação deve ser feita usando bibliotecas oficiais de OpenTelemetry para a linguagem do serviço. Exemplo para Java:
+
+```
+opentelemetry-instrumentation-spring-webmvc
+opentelemetry-instrumentation-jdbc
+opentelemetry-instrumentation-okhttp
+```
+
+Todas as bibliotecas devem ser configuradas para enviar dados para o coletor OTEL centralizado da organização no endpoint `otel-collector.infra.internal:4317`.
+
+## Conformidade e Auditoria
+
+O time de observabilidade realiza auditorias trimestrais para garantir que todos os serviços em produção cumprem este padrão. Serviços não-conformes têm 30 dias para remediação antes de restrições de acesso.
+
+Última revisão: 20 de fevereiro de 2026
+Próxima revisão: 20 de agosto de 2026

@@ -1,0 +1,191 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description?: string;
+  type?: string;
+}
+
+const { title, description = 'Portal de Qualidade, Observabilidade e Arquitetura - Hospital Israelita Albert Einstein', type = 'page' } = Astro.props;
+const currentPath = Astro.url.pathname;
+const navItems = [
+  { label: 'Políticas', href: '/politicas/' },
+  { label: 'Padrões', href: '/padroes/' },
+  { label: 'Ferramentas', href: '/ferramentas/' },
+  { label: 'Comunicações', href: '/comunicacoes/' },
+  { label: 'Notícias', href: '/noticias/' },
+  { label: 'Sobre', href: '/sobre/' },
+];
+---
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content={description} />
+  <title>{title} | QOA Einstein</title>
+  <meta name="theme-color" content="#00539A" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono&display=swap" rel="stylesheet" />
+  <link rel="sitemap" href="/sitemap-index.xml" />
+  <link href="/pagefind/pagefind-ui.css" rel="stylesheet" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="site-header__inner">
+      <a href="/" class="site-header__logo">
+        <strong>QOA</strong> <span>Einstein</span>
+      </a>
+      <nav class="nav" aria-label="Navegação principal">
+        {navItems.map(item => (
+          <a href={item.href} class:list={['nav-link', { 'nav-link--active': currentPath.startsWith(item.href) }]}>
+            {item.label}
+          </a>
+        ))}
+      </nav>
+      <button class="search-toggle" aria-label="Buscar" type="button">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      </button>
+      <button class="nav-toggle" aria-label="Abrir menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+  <div class="search-overlay" id="searchOverlay" aria-hidden="true">
+    <div class="search-modal">
+      <div class="search-modal__header">
+        <span class="search-modal__title">Buscar no portal</span>
+        <button class="search-modal__close" aria-label="Fechar busca" type="button">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div id="pagefindSearch"></div>
+    </div>
+  </div>
+  <main data-pagefind-body>
+    <slot />
+  </main>
+  <footer class="site-footer">
+    <div class="site-footer__inner">
+      <div class="site-footer__grid">
+        <div class="site-footer__brand">
+          <a href="/" class="site-footer__logo">
+            <strong>QOA</strong> <span>Einstein</span>
+          </a>
+          <p class="site-footer__tagline">
+            Portal centralizado de conhecimento para Qualidade, Observabilidade e Arquitetura do Hospital Israelita Albert Einstein.
+          </p>
+        </div>
+        <div>
+          <p class="site-footer__heading">Conteúdo</p>
+          <ul class="site-footer__links">
+            <li><a href="/politicas/">Políticas</a></li>
+            <li><a href="/padroes/">Padrões</a></li>
+            <li><a href="/ferramentas/">Ferramentas</a></li>
+            <li><a href="/comunicacoes/">Comunicações</a></li>
+            <li><a href="/noticias/">Notícias</a></li>
+          </ul>
+        </div>
+        <div>
+          <p class="site-footer__heading">Recursos</p>
+          <ul class="site-footer__links">
+            <li><a href="/sobre/">Sobre o QOA</a></li>
+            <li><a href="https://github.com/einstein-qoa" target="_blank" rel="noopener">GitHub</a></li>
+          </ul>
+        </div>
+        <div>
+          <p class="site-footer__heading">Contato</p>
+          <ul class="site-footer__links">
+            <li><a href="mailto:qoa-team@einstein.br">qoa-team@einstein.br</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="site-footer__bottom">
+        <p class="site-footer__copyright">&copy; {new Date().getFullYear()} Hospital Israelita Albert Einstein — QOA. Todos os direitos reservados.</p>
+        <div class="site-footer__badges">
+          <span class="site-footer__badge">Astro 5</span>
+          <span class="site-footer__badge">Pagefind</span>
+        </div>
+      </div>
+    </div>
+  </footer>
+  <script is:inline>
+    // Nav toggle
+    const toggle = document.querySelector('.nav-toggle');
+    const nav = document.querySelector('.nav');
+    if (toggle && nav) {
+      toggle.addEventListener('click', () => {
+        const expanded = toggle.getAttribute('aria-expanded') === 'true';
+        toggle.setAttribute('aria-expanded', String(!expanded));
+        nav.classList.toggle('nav--open');
+      });
+    }
+
+    // Search modal
+    const searchToggle = document.querySelector('.search-toggle');
+    const searchOverlay = document.getElementById('searchOverlay');
+    const searchClose = document.querySelector('.search-modal__close');
+    let pagefindLoaded = false;
+
+    function openSearch() {
+      if (!searchOverlay) return;
+      searchOverlay.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+      if (!pagefindLoaded) {
+        pagefindLoaded = true;
+        // @ts-ignore
+        import('/pagefind/pagefind-ui.js').then((mod) => {
+          new mod.PagefindUI({
+            element: '#pagefindSearch',
+            showSubResults: true,
+            translations: {
+              placeholder: 'Buscar políticas, padrões, ferramentas...',
+              zero_results: 'Nenhum resultado para "[SEARCH_TERM]"',
+              many_results: '[COUNT] resultados encontrados',
+              one_result: '1 resultado encontrado',
+            }
+          });
+          setTimeout(() => {
+            const input = document.querySelector('#pagefindSearch input');
+            if (input) input.focus();
+          }, 100);
+        }).catch(() => {
+          const el = document.getElementById('pagefindSearch');
+          if (el) el.innerHTML = '<p style="padding:1rem;color:#666;">Busca disponível apenas no build de produção. Execute <code>npm run build && npm run preview</code>.</p>';
+        });
+      } else {
+        setTimeout(() => {
+          const input = document.querySelector('#pagefindSearch input');
+          if (input) input.focus();
+        }, 100);
+      }
+    }
+
+    function closeSearch() {
+      if (!searchOverlay) return;
+      searchOverlay.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+    }
+
+    if (searchToggle) searchToggle.addEventListener('click', openSearch);
+    if (searchClose) searchClose.addEventListener('click', closeSearch);
+    if (searchOverlay) {
+      searchOverlay.addEventListener('click', (e) => {
+        if (e.target === searchOverlay) closeSearch();
+      });
+    }
+
+    // Keyboard shortcut: Ctrl+K or Cmd+K
+    document.addEventListener('keydown', (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        const isOpen = searchOverlay?.getAttribute('aria-hidden') === 'false';
+        isOpen ? closeSearch() : openSearch();
+      }
+      if (e.key === 'Escape') closeSearch();
+    });
+  </script>
+</body>
+</html>

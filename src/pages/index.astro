@@ -1,0 +1,104 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import { getCollection } from 'astro:content';
+
+const allContent = [
+  ...(await getCollection('politicas')),
+  ...(await getCollection('padroes')),
+  ...(await getCollection('ferramentas')),
+  ...(await getCollection('comunicacoes')),
+  ...(await getCollection('noticias')),
+].filter(p => p.data.status !== 'draft')
+ .sort((a, b) => {
+   const da = a.data.date ? new Date(a.data.date).getTime() : 0;
+   const db = b.data.date ? new Date(b.data.date).getTime() : 0;
+   return db - da;
+ });
+
+const recent = allContent.slice(0, 6);
+
+const typeLabels: Record<string, string> = {
+  policy: 'Política', standard: 'Padrão', tool: 'Ferramenta',
+  communication: 'Comunicação', news: 'Notícia',
+};
+
+const typeIcons: Record<string, string> = {
+  policy: 'clipboard-list', standard: 'ruler', tool: 'wrench',
+  communication: 'megaphone', news: 'newspaper',
+};
+
+const collectionUrls: Record<string, string> = {
+  politicas: '/politicas/', padroes: '/padroes/', ferramentas: '/ferramentas/',
+  comunicacoes: '/comunicacoes/', noticias: '/noticias/',
+};
+
+function getUrl(entry: any): string {
+  return `${collectionUrls[entry.collection]}${entry.slug}/`;
+}
+
+function formatDate(d: Date): string {
+  return d.toLocaleDateString('pt-BR', { year: 'numeric', month: 'short', day: 'numeric' });
+}
+
+const sections = [
+  { key: 'politicas', label: 'Políticas', description: 'Políticas de qualidade e procedimentos operacionais', icon: 'clipboard-list' },
+  { key: 'padroes', label: 'Padrões', description: 'Padrões técnicos e arquiteturais', icon: 'ruler' },
+  { key: 'ferramentas', label: 'Ferramentas', description: 'Documentação de ferramentas e plataformas', icon: 'wrench' },
+  { key: 'comunicacoes', label: 'Comunicações', description: 'Anúncios e comunicados oficiais', icon: 'megaphone' },
+  { key: 'noticias', label: 'Notícias', description: 'Artigos, cases e novidades', icon: 'newspaper' },
+];
+---
+<Base title="Início" description="Portal de Qualidade, Observabilidade e Arquitetura - Hospital Israelita Albert Einstein">
+  <section class="hero">
+    <div class="hero__inner">
+      <h1>Qualidade, Observabilidade e Arquitetura</h1>
+      <p>Portal centralizado de conhecimento para políticas, padrões, ferramentas e comunicações do time QOA do Hospital Israelita Albert Einstein.</p>
+    </div>
+  </section>
+
+  <div class="container">
+    <section class="home-section">
+      <h2>Conteúdos Recentes</h2>
+      <div class="content-grid">
+        {recent.map(entry => (
+          <a href={getUrl(entry)} class="card">
+            <div class="card__inner">
+              <div class="card__header">
+                <span class={`badge badge--${entry.data.type}`}>
+                  <Icon name={typeIcons[entry.data.type] || 'file-text'} size={14} strokeWidth="2.5" />
+                  {typeLabels[entry.data.type]}
+                </span>
+                {entry.data.status && entry.data.status !== 'published' && (
+                  <span class={`badge badge--${entry.data.status}`}>{entry.data.status}</span>
+                )}
+              </div>
+              <h3 class="card__title">{entry.data.title}</h3>
+              {entry.data.description && <p class="card__description">{entry.data.description}</p>}
+              {entry.data.date && (
+                <time class="card__date">{formatDate(new Date(entry.data.date))}</time>
+              )}
+            </div>
+          </a>
+        ))}
+      </div>
+    </section>
+
+    <section class="home-section">
+      <h2>Áreas de Conhecimento</h2>
+      <div class="content-grid">
+        {sections.map(s => (
+          <a href={collectionUrls[s.key]} class="card card--area">
+            <div class="card__inner">
+              <div class="card__icon">
+                <Icon name={s.icon} size={32} strokeWidth="1.5" />
+              </div>
+              <h3 class="card__title">{s.label}</h3>
+              <p class="card__description">{s.description}</p>
+            </div>
+          </a>
+        ))}
+      </div>
+    </section>
+  </div>
+</Base>

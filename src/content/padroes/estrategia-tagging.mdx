@@ -1,0 +1,358 @@
+---
+title: "Estratégia de Tagging para Observabilidade"
+description: "Padrão de tags para integração com Microsoft Teams, ServiceNow/CMDB, Segurança e Arquitetura"
+type: "standard"
+status: "active"
+date: 2026-02-27
+version: "1.0.0"
+author: "SRE Observatory"
+tags: ["observabilidade", "tagging", "governança", "dynatrace", "servicenow"]
+richDocument: true
+---
+
+import DocHeader from '../../components/DocHeader.astro';
+import Toc from '../../components/Toc.astro';
+import Section from '../../components/Section.astro';
+import KpiGrid from '../../components/KpiGrid.astro';
+import KpiCard from '../../components/KpiCard.astro';
+import Alert from '../../components/Alert.astro';
+import Tag from '../../components/Tag.astro';
+import Badge from '../../components/Badge.astro';
+import GroupSection from '../../components/GroupSection.astro';
+import Justification from '../../components/Justification.astro';
+import Comparison from '../../components/Comparison.astro';
+import ComparisonCard from '../../components/ComparisonCard.astro';
+import Tree from '../../components/Tree.astro';
+import RiskMatrix from '../../components/RiskMatrix.astro';
+import RiskCell from '../../components/RiskCell.astro';
+import Flow from '../../components/Flow.astro';
+import FlowStep from '../../components/FlowStep.astro';
+import FlowArrow from '../../components/FlowArrow.astro';
+import Timeline from '../../components/Timeline.astro';
+import TimelineItem from '../../components/TimelineItem.astro';
+import ExampleCode from '../../components/ExampleCode.astro';
+import FaqItem from '../../components/FaqItem.astro';
+
+<DocHeader
+  badge="SRE Observatory - Governança"
+  title="Estratégia de Tagging para Observabilidade"
+  subtitle="Padrão de tags para integração com Microsoft Teams, ServiceNow/CMDB, Segurança e Arquitetura"
+  meta={[
+    { label: "Versão", value: "1.0.0" },
+    { label: "Data", value: "27/02/2026" },
+    { label: "Baseline", value: "Assessment Einstein-Prod (19/02/2026)" }
+  ]}
+/>
+
+<div class="container">
+
+<Toc items={[
+  { id: "situacao", label: "Situação Atual" },
+  { id: "taxonomia", label: "Taxonomia de Tags" },
+  { id: "obrigatorias", label: "Tags Obrigatórias" },
+  { id: "desejaveis", label: "Tags Desejáveis" },
+  { id: "identidade", label: "Identidade (app, module)" },
+  { id: "ownership", label: "Ownership (squad)" },
+  { id: "classificacao", label: "Classificação (tier, layer)" },
+  { id: "integracao", label: "Integração (CMDB, Teams)" },
+  { id: "seguranca", label: "Segurança (data-class, exposure)" },
+  { id: "fluxos", label: "Fluxos de Integração" },
+  { id: "priorizacao", label: "Plano de Priorização" },
+  { id: "governanca", label: "Governança e Responsabilidades" },
+]} />
+
+<Section id="situacao" number="01" title="Situação Atual">
+
+O assessment de ambiente (19/02/2026) revelou uma cobertura de tagging **criticamente baixa**. Sem tags padronizadas, não conseguimos rotear alertas, abrir incidentes automaticamente, identificar dados sensíveis ou gerar relatórios por squad.
+
+<KpiGrid>
+  <KpiCard value="4,9%" label="Tag Compliance" sub="Meta: 95%" variant="critical" />
+  <KpiCard value="0%" label="Tag app" sub="0 / 2.129 serviços" variant="critical" />
+  <KpiCard value="0%" label="Tag environment" sub="0 / 2.129 serviços" variant="critical" />
+  <KpiCard value="1,4%" label="Tag tier" sub="30 / 2.129 serviços" variant="warning" />
+</KpiGrid>
+
+<Alert variant="critical" title="Impacto direto: ~28,6 horas/mês de trabalho manual">
+  Sem tags, cada incidente requer triagem manual para identificar time responsável, criticidade do serviço e canal de comunicação. Esse trabalho pode ser eliminado com tagging adequado.
+</Alert>
+
+</Section>
+
+<Section id="taxonomia" number="02" title="Taxonomia de Tags">
+
+As tags são organizadas em **5 grupos** por finalidade. Cada grupo atende um ou mais vetores de integração.
+
+| Grupo | Pergunta que Responde | Tags | Integrações |
+|---|---|---|---|
+| **Identidade** | A qual sistema este microsserviço pertence? | <Tag variant="mandatory">app</Tag> <Tag variant="mandatory">module</Tag> <Tag variant="recommended">component</Tag> | CMDB, Arquitetura |
+| **Ownership** | Quem é responsável e como contato? | <Tag variant="mandatory">squad</Tag> <Tag variant="recommended">team-lead</Tag> <Tag variant="recommended">support-group</Tag> | Teams, ServiceNow |
+| **Classificação** | Qual a criticidade e onde se encaixa? | <Tag variant="progressive">tier</Tag> <Tag variant="mandatory">environment</Tag> <Tag variant="mandatory">layer</Tag> <Tag variant="recommended">domain</Tag> | SLOs, Alerting, Arquitetura |
+| **Integração** | Como conecto ao CMDB e Teams? | <Tag variant="recommended">cmdb-ci</Tag> <Tag variant="recommended">business-service</Tag> <Tag variant="recommended">teams-channel</Tag> | ServiceNow, Teams |
+| **Segurança** | Qual o perfil de risco? | <Tag variant="mandatory">internet-facing</Tag> <Tag variant="conditional">data-classification</Tag> <Tag variant="recommended">compliance</Tag> | Security, Compliance |
+
+<Badge variant="mandatory">Obrigatória</Badge> Todos os serviços &nbsp;
+<Badge variant="progressive">Progressiva</Badge> Expansão por escopo &nbsp;
+<Badge variant="conditional">Condicional</Badge> Obrigatória para Tier 1-2 &nbsp;
+<Badge variant="recommended">Desejável</Badge> Recomendada
+
+</Section>
+
+<Section id="obrigatorias" number="03" title="Tags Obrigatórias">
+
+Estas tags devem estar presentes em todo serviço para que o ambiente esteja em conformidade. A coluna *"Por quê?"* explica o que ficamos **impedidos de fazer** sem cada tag.
+
+| # | Tag | Grupo | Nível | Por que essa tag é necessária? |
+|---|---|---|---|---|
+| 1 | <Tag variant="mandatory">app</Tag> | Identidade | <Badge variant="mandatory">Obrig.</Badge> | Sem ela, não sabemos a qual sistema o serviço pertence. Impossível agrupar problemas por aplicação. |
+| 2 | <Tag variant="mandatory">module</Tag> | Identidade | <Badge variant="mandatory">Obrig.</Badge> | Em microsserviços, `app` não basta. `module` permite drill-down granular. |
+| 3 | <Tag variant="mandatory">squad</Tag> | Ownership | <Badge variant="mandatory">Obrig.</Badge> | Sem ownership, alertas não têm destinatário. Impossível rotear para o canal correto. |
+| 4 | <Tag variant="progressive">tier</Tag> | Classificação | <Badge variant="progressive">Progr.</Badge> | Sem criticidade, todos os problemas têm o mesmo peso. Adoção progressiva: Top 100 primeiro. |
+| 5 | <Tag variant="mandatory">environment</Tag> | Classificação | <Badge variant="mandatory">Obrig.</Badge> | Sem separação de ambiente, métricas de PRD e HML se misturam. |
+| 6 | <Tag variant="mandatory">layer</Tag> | Classificação | <Badge variant="mandatory">Obrig.</Badge> | Classifica o serviço na taxonomia arquitetural (5 camadas). |
+| 7 | <Tag variant="mandatory">internet-facing</Tag> | Segurança | <Badge variant="mandatory">Obrig.</Badge> | Segurança precisa saber quais serviços estão expostos à internet. |
+| 8 | <Tag variant="conditional">data-classification</Tag> | Segurança | <Badge variant="conditional">Tier 1-2</Badge> | Identifica se o serviço processa PHI, PII ou dados confidenciais. |
+
+</Section>
+
+<Section id="identidade" number="05" title="Identidade: app, module, component">
+
+<GroupSection
+  icon="📁"
+  title="A qual sistema este microsserviço pertence e qual é seu papel?"
+  question="Em arquiteturas de microsserviços, um sistema é composto por módulos com múltiplos componentes."
+  variant="identity"
+>
+
+### Hierarquia: app > module > component
+
+<Tree>
+{`app:siaf
+├── module:gateway
+│   └── component:api          →  siaf-gateway - PRD
+├── module:pedidos
+│   ├── component:api          →  siaf-pedidos-api - PRD
+│   └── component:worker       →  siaf-pedidos-worker - PRD
+├── module:str
+│   └── component:api          →  siaf-str - PRD
+└── module:gdoc
+    └── component:api          →  siaf-gdoc - PRD`}
+</Tree>
+
+<Justification title="Por que precisamos de module?">
+  Em arquitetura de microsserviços, agrupar apenas por `app` é insuficiente. O SIAF, por exemplo, tem 169 problemas no total — sem `module`, essa informação não é acionável. Com `module`, sabemos que o Gateway tem 20 e Pedidos tem 8.
+</Justification>
+
+<Comparison>
+  <ComparisonCard variant="bad" label="Sem module">
+    - "SIAF tem 169 problemas" (e agora?)
+    - Um único canal do Teams para tudo
+    - ServiceNow abre ticket genérico
+    - Impossível saber qual parte degrada
+  </ComparisonCard>
+  <ComparisonCard variant="good" label="Com module">
+    - "SIAF-Gateway: 20, SIAF-Pedidos: 8"
+    - Canal específico por módulo/squad
+    - ServiceNow direciona ao squad certo
+    - Drill-down imediato no módulo afetado
+  </ComparisonCard>
+</Comparison>
+
+</GroupSection>
+
+</Section>
+
+<Section id="seguranca" number="09" title="Segurança: data-classification, internet-facing, compliance">
+
+<GroupSection
+  icon="🔒"
+  title="Qual o perfil de risco deste serviço? Processa dados sensíveis? Está exposto?"
+  question="Subsidia o time de segurança para priorização de vulnerabilidades e compliance."
+  variant="security"
+>
+
+### Matriz de Risco
+
+Combinação de `data-classification` e `internet-facing` determina o nível de risco:
+
+<RiskMatrix>
+  <RiskCell variant="header"></RiskCell>
+  <RiskCell variant="header">internet-facing: no</RiskCell>
+  <RiskCell variant="header">internet-facing: yes</RiskCell>
+  <RiskCell variant="header">phi</RiskCell>
+  <RiskCell variant="high" title="ALTO">Audit + encrypt</RiskCell>
+  <RiskCell variant="critical" title="CRÍTICO">Audit + WAF + pentest</RiskCell>
+  <RiskCell variant="header">pii</RiskCell>
+  <RiskCell variant="medium" title="MÉDIO">Masking + LGPD</RiskCell>
+  <RiskCell variant="high" title="ALTO">+ WAF + scan</RiskCell>
+  <RiskCell variant="header">confidential</RiskCell>
+  <RiskCell variant="medium" title="MÉDIO">Access control</RiskCell>
+  <RiskCell variant="high" title="ALTO">+ WAF + scan</RiskCell>
+  <RiskCell variant="header">internal / public</RiskCell>
+  <RiskCell variant="low" title="BAIXO">Controles padrão</RiskCell>
+  <RiskCell variant="medium" title="MÉDIO">WAF básico</RiskCell>
+</RiskMatrix>
+
+</GroupSection>
+
+</Section>
+
+<Section id="fluxos" number="10" title="Fluxos de Integração">
+
+Como as tags fluem para cada sistema integrado.
+
+<Flow title="Dynatrace → Microsoft Teams">
+  <FlowStep label="Problema<br>Detectado" />
+  <FlowArrow />
+  <FlowStep label="Alerting Profile" detail="filtra por <code>tier</code>" />
+  <FlowArrow />
+  <FlowStep label="Lê tags" detail="<code>squad</code> + <code>teams-channel</code>" />
+  <FlowArrow />
+  <FlowStep label="Webhook" detail="envia para canal" />
+  <FlowArrow />
+  <FlowStep label="<strong>#alerts-{channel}</strong>" detail="com app, module, tier, env" highlight={true} color="#DBEAFE" />
+</Flow>
+
+<Flow title="Dynatrace → ServiceNow">
+  <FlowStep label="Problema<br>Detectado" />
+  <FlowArrow />
+  <FlowStep label="Integração<br>DT-SNOW" />
+  <FlowArrow />
+  <FlowStep label="Mapeia tags" detail="<code>cmdb-ci</code> → CI<br><code>support-group</code> → Group<br><code>tier</code> → Impact" />
+  <FlowArrow />
+  <FlowStep label="<strong>Incident criado</strong>" detail="com routing automático" highlight={true} color="#D1FAE5" />
+</Flow>
+
+<Flow title="Dynatrace → Time de Segurança">
+  <FlowStep label="Vulnerabilidade<br>Detectada" />
+  <FlowArrow />
+  <FlowStep label="Enriquece" detail="<code>data-classification</code><br><code>internet-facing</code><br><code>compliance</code>" />
+  <FlowArrow />
+  <FlowStep label="Calcula<br>Risco" />
+  <FlowArrow />
+  <FlowStep label="<strong>Priorização</strong>" detail="internet + phi = CRÍTICO" highlight={true} color="#FEE2E2" />
+</Flow>
+
+</Section>
+
+<Section id="priorizacao" number="11" title="Plano de Priorização">
+
+Implementação incremental em 4 fases, começando pelas tags com maior impacto e menor esforço.
+
+<Timeline>
+  <TimelineItem phase={1} title="Fase 1: Fundação" period="Semanas 1-2">
+    Estabelecer identidade e classificação básica. Foco em auto-tag rules (esforço baixo, cobertura alta).
+
+    | Tag | Método | Meta |
+    |---|---|---|
+    | `app` | Auto-tag rules (naming patterns) | > 70% |
+    | `environment` | Auto-tag rules (sufixo PRD/HML) | > 70% |
+    | `tier` | Workshop com squads | 100% do Top 100 |
+    | `layer` | Auto-tag rules (entity type + naming) | > 60% |
+  </TimelineItem>
+
+  <TimelineItem phase={2} title="Fase 2: Ownership e Routing" period="Semanas 3-4">
+    Habilitar routing de alertas para Teams e ServiceNow.
+
+    | Tag | Método | Meta |
+    |---|---|---|
+    | `squad` | Manual — cada squad tageia seus serviços | > 80% |
+    | `module` | Auto-tag refinado + manual para ambíguos | > 60% |
+    | `teams-channel` | Derivado do squad (1 canal por squad) | Todos os squads |
+    | `tier` | Expandir para Top 300 | Top 300 |
+  </TimelineItem>
+
+  <TimelineItem phase={3} title="Fase 3: Segurança e CMDB" period="Semanas 5-6">
+    Dar subsídio para o time de segurança e vincular ao CMDB.
+
+    | Tag | Método | Meta |
+    |---|---|---|
+    | `data-classification` | Workshop segurança + squads | > 90% (Tier 1-2) |
+    | `internet-facing` | Análise de topologia | 100% |
+    | `cmdb-ci` | Integração CMDB export ou API | Tier 1 vinculado |
+  </TimelineItem>
+
+  <TimelineItem phase={4} title="Fase 4: Refinamento" period="Semana 7+">
+    Tags de enriquecimento e melhoria contínua. `tier` se torna obrigatório universal.
+
+    | Tag | Método | Meta |
+    |---|---|---|
+    | `domain` | Derivado de Management Zones | 80% |
+    | `journey` | Workshop com times clínicos | Serviços clínicos |
+    | `tier` | Obrigatório universal | 95% |
+  </TimelineItem>
+</Timeline>
+
+</Section>
+
+<Section id="governanca" number="12" title="Governança e Responsabilidades">
+
+### Quem faz o quê
+
+| Papel | Responsabilidade |
+|---|---|
+| **Squad** | Taguear seus serviços (`app`, `module`, `squad`), manter tags atualizadas |
+| **Tech Lead** | Validar classificação de `tier` e `data-classification` do squad |
+| **SRE / Observabilidade** | Manter auto-tag rules, reportar compliance semanal, configurar alerting profiles |
+| **Arquitetura** | Definir valores de `layer` e `domain`, validar taxonomia |
+| **Segurança** | Definir critérios de `data-classification` e `internet-facing`, validar compliance |
+| **ServiceNow Admin** | Manter mapeamento `cmdb-ci`, `business-service` e `support-group` |
+
+### Ciclo de Revisão
+
+| Frequência | Ação | Responsável |
+|---|---|---|
+| **Semanal** | Assessment automatizado de tag compliance | SRE Observatory |
+| **Mensal** | Review de cobertura, cobrança de squads fora da meta | SRE + Tech Leads |
+| **Trimestral** | Revisão da taxonomia (novos valores de `domain`, `layer`, `journey`) | Arquitetura + Segurança |
+
+</Section>
+
+<Section title="Perguntas que Cada Tag Responde">
+
+Se você precisa responder alguma dessas perguntas, as tags indicadas são necessárias.
+
+<FaqItem question="Quais serviços do SIAF estão com problema?">
+  <Tag variant="mandatory">app</Tag>
+</FaqItem>
+
+<FaqItem question="Qual módulo do SIAF está degradando?">
+  <Tag variant="mandatory">app</Tag> + <Tag variant="mandatory">module</Tag>
+</FaqItem>
+
+<FaqItem question="Qual squad tem mais incidentes?">
+  <Tag variant="mandatory">squad</Tag>
+</FaqItem>
+
+<FaqItem question="Para quem escalar este incidente no Teams?">
+  <Tag variant="mandatory">squad</Tag> + <Tag variant="recommended">teams-channel</Tag>
+</FaqItem>
+
+<FaqItem question="Qual o CI afetado para abrir ticket no ServiceNow?">
+  <Tag variant="recommended">cmdb-ci</Tag> + <Tag variant="recommended">support-group</Tag>
+</FaqItem>
+
+<FaqItem question="Este serviço processa dados de paciente?">
+  <Tag variant="conditional">data-classification</Tag>
+</FaqItem>
+
+<FaqItem question="Quais serviços expostos à internet têm vulnerabilidades?">
+  <Tag variant="mandatory">internet-facing</Tag> + <Tag variant="conditional">data-classification</Tag>
+</FaqItem>
+
+<FaqItem question="Como está a saúde da camada de dados?">
+  <Tag variant="mandatory">layer</Tag>
+</FaqItem>
+
+<FaqItem question="Métricas são de produção ou homologação?">
+  <Tag variant="mandatory">environment</Tag>
+</FaqItem>
+
+</Section>
+
+<div class="footer">
+  <strong>SRE Observatory</strong> — Estratégia de Tagging para Observabilidade v1.0.0<br/>
+  Baseado no Environment Assessment Einstein-Prod (19/02/2026)<br/><br/>
+  Arquitetura Institucional e Engenharia de Observabilidade
+</div>
+
+</div>

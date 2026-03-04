@@ -1,0 +1,27 @@
+---
+---
+
+<div class="risk-matrix">
+  <slot />
+</div>
+
+<style>
+  .risk-matrix {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    margin: 2rem 0;
+  }
+
+  @media (max-width: 768px) {
+    .risk-matrix {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 480px) {
+    .risk-matrix {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

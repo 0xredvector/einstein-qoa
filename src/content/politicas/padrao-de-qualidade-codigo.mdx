@@ -1,0 +1,89 @@
+---
+title: "Política de Qualidade de Código"
+description: "Diretrizes e requisitos mínimos para garantir a qualidade do código em todos os projetos da organização"
+date: 2026-02-01
+updated: 2026-02-15
+type: "policy"
+category: "qualidade"
+tags: ["qualidade", "codigo", "revisao", "qa"]
+status: "published"
+author: "Time de QA"
+version: "1.0"
+effectiveDate: "2026-03-01"
+reviewDate: "2027-03-01"
+---
+
+## Escopo
+
+Esta política estabelece os padrões mínimos de qualidade de código que devem ser aplicados a todos os projetos de desenvolvimento da organização Einstein. Aplica-se a todo código contribuído para repositórios oficiais, independentemente da linguagem de programação, tecnologia ou equipe responsável.
+
+## Princípios Fundamentais
+
+A qualidade de código é responsabilidade compartilhada entre desenvolvedores, revisores e líderes técnicos. Cada membro da organização tem o compromisso de:
+
+- **Manutenibilidade**: Escrever código claro e compreensível que possa ser mantido por qualquer desenvolvedor da equipe
+- **Rastreabilidade**: Toda mudança deve ser documentada e relacionada a uma história ou ticket específico
+- **Segurança**: Aplicar princípios de segurança em camadas, desde a arquitetura até a implementação
+- **Performance**: Considerar eficiência de recursos e impacto em sistemas dependentes
+- **Testabilidade**: Estruturar código de forma a permitir cobertura adequada de testes
+
+## Requisitos Obrigatórios
+
+Todas as contribuições de código devem cumprir os seguintes requisitos antes de serem mescladas ao repositório principal:
+
+### Revisão de Código
+- Mínimo de 2 revisores aprovando a solicitação de pull request
+- Pelo menos 1 revisor deve ser um especialista no domínio afetado
+- Comentários críticos devem ser resolvidos antes da aprovação
+- Nenhuma aprovação é válida sem testes passando
+
+### Cobertura de Testes
+- Mínimo de 80% de cobertura de código para novas funcionalidades
+- Cobertura não pode diminuir em relação ao commit anterior
+- Testes devem cobrir casos de sucesso, erro e edge cases
+- Testes automatizados devem estar em repositório público e versionados
+
+### Análise Estática
+- Todas as análises de linter devem passar sem exceções
+- Complexidade ciclomática máxima de 10 por método
+- Nenhuma violação de padrões de estilo definidos pelo projeto
+- Ferramentas SAST devem detectar zero vulnerabilidades críticas
+
+### Documentação
+- Código complexo deve incluir comentários explicativos
+- APIs públicas devem ter documentação completa
+- Mudanças arquiteturais devem ter ADR (Architecture Decision Record) associado
+- README deve ser atualizado se houver alterações em setup ou dependências
+
+## Processo de Conformidade
+
+A conformidade com esta política é verificada automaticamente através de CI/CD pipelines antes do merge. Cada repositório deve configurar as seguintes verificações obrigatórias:
+
+```
+- testes automatizados com coverage report
+- linting e formatação de código
+- análise de segurança (SAST e dependências)
+- verificação de commits assinados
+- análise de complexidade ciclomática
+```
+
+Desvios são permitidos apenas mediante aprovação explícita da liderança técnica e documentação clara do motivo.
+
+## Processo de Revisão
+
+O processo de revisão de código segue o seguinte fluxo:
+
+1. Desenvolvedor submete pull request com descrição clara
+2. Testes e análises automáticas devem passar antes de reviewers serem convidados
+3. Reviewers avaliam conforme checklist de qualidade definido por projeto
+4. Solicitações de mudança devem ser justificadas e construtivas
+5. Após aprovação de todos os reviewers, código é mesclado automaticamente
+
+## Responsabilidades
+
+- **Desenvolvedores**: Seguir padrões, escrever testes, solicitar revisões
+- **Revisores**: Garantir conformidade, elevar padrão de qualidade, mentoring
+- **Líderes Técnicos**: Manter políticas atualizadas, resolver exceções, coaching
+- **Time QA**: Auditar conformidade, melhorar processos, validação end-to-end
+
+Esta política entra em vigor em 01 de março de 2026 e será revisada anualmente em 01 de março de 2027.

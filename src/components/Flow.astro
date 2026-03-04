@@ -1,0 +1,48 @@
+---
+interface Props {
+  title?: string;
+}
+const { title } = Astro.props;
+---
+
+<div class="flow">
+  {title && <div class="flow-title">{title}</div>}
+  <div class="flow-steps">
+    <slot />
+  </div>
+</div>
+
+<style>
+  .flow {
+    margin: 2rem 0;
+  }
+
+  .flow-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    color: var(--color-primary-blue);
+  }
+
+  .flow-steps {
+    display: flex;
+    gap: 0;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .flow-steps :global(.flow-step) {
+    flex: 1;
+    min-width: 150px;
+  }
+
+  @media (max-width: 768px) {
+    .flow-steps {
+      flex-direction: column;
+    }
+
+    .flow-steps :global(.flow-arrow) {
+      display: none;
+    }
+  }
+</style>

@@ -1,0 +1,48 @@
+---
+import Base from '../../layouts/Base.astro';
+import Icon from '../../components/Icon.astro';
+import { getCollection } from 'astro:content';
+
+const entries = (await getCollection('ferramentas'))
+  .filter(p => p.data.status !== 'draft')
+  .sort((a, b) => {
+    const da = a.data.date ? new Date(a.data.date).getTime() : 0;
+    const db = b.data.date ? new Date(b.data.date).getTime() : 0;
+    return db - da;
+  });
+
+const statusLabels: Record<string, string> = {
+  active: 'Ativo', published: 'Publicado', deprecated: 'Descontinuado', beta: 'Beta',
+};
+
+function formatDate(d: Date): string {
+  return d.toLocaleDateString('pt-BR', { year: 'numeric', month: 'long', day: 'numeric' });
+}
+---
+<Base title="Ferramentas" description="Documentação de ferramentas, plataformas e utilitários">
+  <div class="container">
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      <a href="/">Início</a>
+      <span aria-hidden="true">›</span>
+      <span aria-current="page">Ferramentas</span>
+    </nav>
+    <h1>Ferramentas</h1>
+    <p class="section-intro">Documentação de ferramentas, plataformas e utilitários utilizados pelo time QOA.</p>
+    {entries.length === 0 && <p>Nenhuma ferramenta documentada ainda.</p>}
+    <div class="content-grid">
+      {entries.map(entry => (
+        <a href={`/ferramentas/${entry.slug}/`} class="card">
+          <div class="card__inner">
+            <div class="card__header">
+              <span class="badge badge--tool"><Icon name="wrench" size={14} strokeWidth="2.5" /> Ferramenta</span>
+              {entry.data.status && <span class={`badge badge--${entry.data.status}`}>{statusLabels[entry.data.status] || entry.data.status}</span>}
+            </div>
+            <h3 class="card__title">{entry.data.title}</h3>
+            {entry.data.description && <p class="card__description">{entry.data.description}</p>}
+            {entry.data.date && <time class="card__date">{formatDate(new Date(entry.data.date))}</time>}
+          </div>
+        </a>
+      ))}
+    </div>
+  </div>
+</Base>

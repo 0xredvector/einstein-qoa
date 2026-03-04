@@ -1,0 +1,48 @@
+---
+interface Props {
+  variant: 'good' | 'bad';
+  label: string;
+}
+const { variant, label } = Astro.props;
+---
+
+<div class={`comparison-card comparison-${variant}`}>
+  <div class="label">{label}</div>
+  <slot />
+</div>
+
+<style>
+  .comparison-card {
+    border: 2px solid;
+    border-radius: var(--border-radius-base);
+    padding: 1.5rem;
+  }
+
+  .label {
+    font-weight: 700;
+    font-size: 1rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid currentColor;
+  }
+
+  .comparison-good {
+    border-color: #388e3c;
+    background: rgba(56, 142, 60, 0.05);
+    color: #1b5e20;
+  }
+
+  .comparison-good .label {
+    color: #388e3c;
+  }
+
+  .comparison-bad {
+    border-color: #d32f2f;
+    background: rgba(211, 47, 47, 0.05);
+    color: #b71c1c;
+  }
+
+  .comparison-bad .label {
+    color: #d32f2f;
+  }
+</style>

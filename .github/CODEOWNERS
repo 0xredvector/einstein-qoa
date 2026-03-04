@@ -1,0 +1,17 @@
+# Ownership padrão
+* @qoa-team
+
+# Conteúdo por área
+src/content/politicas/ @qoa-team @qa-leads
+src/content/padroes/ @qoa-team @arquitetura
+src/content/ferramentas/ @qoa-team @sre-team
+src/content/comunicacoes/ @qoa-team @gestao
+src/content/noticias/ @qoa-team
+
+# Componentes e layouts
+src/components/ @qoa-team @frontend-leads
+src/layouts/ @qoa-team @frontend-leads
+src/styles/ @qoa-team @frontend-leads
+
+# CI/CD
+.github/ @qoa-team @devops

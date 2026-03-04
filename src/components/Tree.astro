@@ -1,0 +1,38 @@
+---
+---
+
+<div class="tree">
+  <slot />
+</div>
+
+<style>
+  .tree {
+    background: var(--bg-surface, #F5F7FA);
+    border: 1px solid var(--border-light, #E8ECF0);
+    border-radius: 10px;
+    padding: 20px 24px;
+    overflow-x: auto;
+    font-family: 'DM Mono', 'Consolas', monospace;
+    font-size: 13px;
+    line-height: 1.8;
+    white-space: pre;
+    color: var(--text-primary, #241F21);
+  }
+
+  .tree :global(code) {
+    color: var(--text-primary, #241F21);
+    background: none;
+    padding: 0;
+  }
+
+  .tree :global(pre) {
+    margin: 0;
+    color: inherit;
+  }
+
+  .tree :global(p) {
+    margin: 0;
+    white-space: pre;
+    color: inherit;
+  }
+</style>

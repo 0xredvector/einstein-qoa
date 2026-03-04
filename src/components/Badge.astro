@@ -1,0 +1,56 @@
+---
+interface Props {
+  variant?: string;
+}
+const { variant = 'mandatory' } = Astro.props;
+---
+
+<span class={`badge badge-${variant}`}>
+  <slot />
+</span>
+
+<style>
+  .badge {
+    display: inline-block;
+    padding: 0.25rem 0.65rem;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .badge-mandatory {
+    background: #d32f2f;
+    color: white;
+  }
+
+  .badge-progressive {
+    background: #f57c00;
+    color: white;
+  }
+
+  .badge-conditional {
+    background: #7b1fa2;
+    color: white;
+  }
+
+  .badge-recommended {
+    background: #388e3c;
+    color: white;
+  }
+
+  .badge-info {
+    background: #1976d2;
+    color: white;
+  }
+
+  .badge-beta {
+    background: #00bcd4;
+    color: white;
+  }
+
+  .badge-deprecated {
+    background: #757575;
+    color: white;
+  }
+</style>

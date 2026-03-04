@@ -1,0 +1,21 @@
+---
+---
+
+<div class="comparison">
+  <slot />
+</div>
+
+<style>
+  .comparison {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+    margin: 2rem 0;
+  }
+
+  @media (max-width: 768px) {
+    .comparison {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

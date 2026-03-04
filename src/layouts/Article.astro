@@ -1,0 +1,74 @@
+---
+import Base from './Base.astro';
+
+interface Props {
+  frontmatter: {
+    title: string;
+    description?: string;
+    type?: string;
+    status?: string;
+    date?: string;
+    author?: string;
+    tags?: string[];
+    version?: string;
+  };
+}
+
+const { frontmatter } = Astro.props;
+const { title, description, type, status, date, author, tags, version } = frontmatter;
+
+const typeLabels: Record<string, string> = {
+  policy: 'Política', standard: 'Padrão', tool: 'Ferramenta',
+  communication: 'Comunicação', news: 'Notícia',
+};
+const statusLabels: Record<string, string> = {
+  active: 'Ativo', published: 'Publicado', draft: 'Rascunho',
+  deprecated: 'Descontinuado', beta: 'Beta',
+};
+const sectionUrls: Record<string, { href: string; label: string }> = {
+  policy: { href: '/politicas/', label: 'Políticas' },
+  standard: { href: '/padroes/', label: 'Padrões' },
+  tool: { href: '/ferramentas/', label: 'Ferramentas' },
+  communication: { href: '/comunicacoes/', label: 'Comunicações' },
+  news: { href: '/noticias/', label: 'Notícias' },
+};
+const section = type ? sectionUrls[type] : null;
+
+function formatDate(d: string): string {
+  return new Date(d).toLocaleDateString('pt-BR', { year: 'numeric', month: 'long', day: 'numeric' });
+}
+---
+<Base title={title} description={description} type={type}>
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Início</a>
+    {section && <><span aria-hidden="true">›</span><a href={section.href}>{section.label}</a></>}
+    <span aria-hidden="true">›</span>
+    <span aria-current="page">{title}</span>
+  </nav>
+
+  <article class="article-content">
+    <header class="article-content__header">
+      <h1>{title}</h1>
+      <div class="article-meta">
+        {type && <span class={`badge badge--${type}`}>{typeLabels[type] || type}</span>}
+        {status && <span class={`badge badge--status badge--${status}`}>{statusLabels[status] || status}</span>}
+        {version && <span class="badge">v{version}</span>}
+        {date && <time datetime={new Date(date).toISOString().split('T')[0]}>{formatDate(date)}</time>}
+        {author && <span>por {author}</span>}
+      </div>
+    </header>
+
+    <div class="article-content__body">
+      <slot />
+    </div>
+
+    {tags && tags.length > 0 && (
+      <footer class="article-content__tags">
+        <strong>Tags:</strong>
+        {tags.map(tag => (
+          <a href={`/busca/?tag=${encodeURIComponent(tag)}`} class="tag">{tag}</a>
+        ))}
+      </footer>
+    )}
+  </article>
+</Base>

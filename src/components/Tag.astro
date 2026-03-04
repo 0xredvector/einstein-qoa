@@ -1,0 +1,45 @@
+---
+interface Props {
+  variant?: 'mandatory' | 'progressive' | 'conditional' | 'recommended';
+}
+const { variant = 'mandatory' } = Astro.props;
+---
+
+<span class={`tag tag-${variant}`}>
+  <slot />
+</span>
+
+<style>
+  .tag {
+    display: inline-block;
+    padding: 0.35rem 0.75rem;
+    border-radius: var(--border-radius-base);
+    font-size: 0.85rem;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .tag-mandatory {
+    background: #ffebee;
+    color: #c62828;
+    border: 1px solid #ef5350;
+  }
+
+  .tag-progressive {
+    background: #fff3e0;
+    color: #e65100;
+    border: 1px solid #ffb74d;
+  }
+
+  .tag-conditional {
+    background: #f3e5f5;
+    color: #6a1b9a;
+    border: 1px solid #ba68c8;
+  }
+
+  .tag-recommended {
+    background: #e8f5e9;
+    color: #1b5e20;
+    border: 1px solid #81c784;
+  }
+</style>

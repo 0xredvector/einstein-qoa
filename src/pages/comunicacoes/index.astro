@@ -1,0 +1,48 @@
+---
+import Base from '../../layouts/Base.astro';
+import Icon from '../../components/Icon.astro';
+import { getCollection } from 'astro:content';
+
+const entries = (await getCollection('comunicacoes'))
+  .filter(p => p.data.status !== 'draft')
+  .sort((a, b) => {
+    const da = a.data.date ? new Date(a.data.date).getTime() : 0;
+    const db = b.data.date ? new Date(b.data.date).getTime() : 0;
+    return db - da;
+  });
+
+const statusLabels: Record<string, string> = {
+  active: 'Ativo', published: 'Publicado', deprecated: 'Descontinuado', beta: 'Beta',
+};
+
+function formatDate(d: Date): string {
+  return d.toLocaleDateString('pt-BR', { year: 'numeric', month: 'long', day: 'numeric' });
+}
+---
+<Base title="Comunicações" description="Anúncios, atas de reunião e comunicados oficiais">
+  <div class="container">
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      <a href="/">Início</a>
+      <span aria-hidden="true">›</span>
+      <span aria-current="page">Comunicações</span>
+    </nav>
+    <h1>Comunicações</h1>
+    <p class="section-intro">Anúncios, atas de reunião e comunicados oficiais do time QOA.</p>
+    {entries.length === 0 && <p>Nenhuma comunicação publicada ainda.</p>}
+    <div class="content-grid">
+      {entries.map(entry => (
+        <a href={`/comunicacoes/${entry.slug}/`} class="card">
+          <div class="card__inner">
+            <div class="card__header">
+              <span class="badge badge--communication"><Icon name="megaphone" size={14} strokeWidth="2.5" /> Comunicação</span>
+              {entry.data.status && <span class={`badge badge--${entry.data.status}`}>{statusLabels[entry.data.status] || entry.data.status}</span>}
+            </div>
+            <h3 class="card__title">{entry.data.title}</h3>
+            {entry.data.description && <p class="card__description">{entry.data.description}</p>}
+            {entry.data.date && <time class="card__date">{formatDate(new Date(entry.data.date))}</time>}
+          </div>
+        </a>
+      ))}
+    </div>
+  </div>
+</Base>

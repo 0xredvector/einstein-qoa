@@ -1,0 +1,46 @@
+---
+interface Props {
+  label: string;
+  detail?: string;
+  highlight?: boolean;
+  color?: string;
+}
+const { label, detail, highlight = false, color } = Astro.props;
+const style = highlight && color ? `background: ${color}; border-color: ${color}88;` : '';
+---
+
+<div class="flow-step" {style}>
+  <Fragment set:html={label} />
+  {detail && <small><Fragment set:html={detail} /></small>}
+</div>
+
+<style>
+  .flow-step {
+    background: white;
+    border: 2px solid var(--color-primary-blue);
+    border-radius: var(--border-radius-base);
+    padding: 1.5rem;
+    text-align: center;
+    transition: all 0.3s ease;
+    position: relative;
+    color: var(--color-neutral-gray, #333333);
+  }
+
+  .flow-step:hover {
+    box-shadow: 0 4px 12px rgba(0, 83, 154, 0.15);
+    transform: translateY(-2px);
+  }
+
+  .flow-step small {
+    display: block;
+    margin-top: 0.5rem;
+    color: #666;
+    font-size: 0.85rem;
+  }
+
+  @media (max-width: 768px) {
+    .flow-step {
+      width: 100%;
+    }
+  }
+</style>

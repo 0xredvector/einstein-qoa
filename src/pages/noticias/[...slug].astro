@@ -1,0 +1,26 @@
+---
+import { getCollection } from 'astro:content';
+import Article from '../../layouts/Article.astro';
+import Document from '../../layouts/Document.astro';
+
+export async function getStaticPaths() {
+  const entries = await getCollection('noticias');
+  return entries.map(entry => ({
+    params: { slug: entry.slug },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await entry.render();
+const useDocumentLayout = entry.data.richDocument === true;
+---
+{useDocumentLayout ? (
+  <Document frontmatter={entry.data}>
+    <Content />
+  </Document>
+) : (
+  <Article frontmatter={entry.data}>
+    <Content />
+  </Article>
+)}

@@ -1,0 +1,62 @@
+---
+interface Props {
+  title?: string;
+}
+const { title } = Astro.props;
+---
+
+{title && <p class="text-sm text-muted fw-600">{title}</p>}
+<div class="example-card">
+  <slot />
+</div>
+
+<style>
+  .text-sm {
+    font-size: 0.875rem;
+  }
+
+  .text-muted {
+    color: #666;
+  }
+
+  .fw-600 {
+    font-weight: 600;
+  }
+
+  .example-card {
+    background: #1e1e1e;
+    border: 1px solid #333;
+    border-radius: var(--border-radius-base);
+    padding: 1.5rem;
+    overflow-x: auto;
+    margin: 1rem 0;
+  }
+
+  .example-card :global(code) {
+    color: #d4d4d4;
+    font-family: 'Courier New', 'Courier', monospace;
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+
+  .example-card :global(pre) {
+    margin: 0;
+    overflow-x: auto;
+  }
+
+  .example-card :global(.hljs-string) {
+    color: #ce9178;
+  }
+
+  .example-card :global(.hljs-number) {
+    color: #b5cea8;
+  }
+
+  .example-card :global(.hljs-literal) {
+    color: #569cd6;
+  }
+
+  .example-card :global(.hljs-attr) {
+    color: #9cdcfe;
+  }
+</style>

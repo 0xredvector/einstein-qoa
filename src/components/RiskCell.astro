@@ -1,0 +1,63 @@
+---
+interface Props {
+  variant?: 'critical' | 'high' | 'medium' | 'low' | 'header';
+  title?: string;
+}
+const { variant = 'low', title } = Astro.props;
+const cls = variant === 'header' ? 'cell header-cell' : `cell risk-${variant}`;
+---
+
+<div class={cls}>
+  {title && <span class="risk-cell-title">{title}</span>}
+  <slot />
+</div>
+
+<style>
+  .cell {
+    padding: 1rem;
+    border-radius: var(--border-radius-base);
+    border: 1px solid;
+    min-height: 100px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .header-cell {
+    background: var(--color-primary-blue);
+    color: white;
+    font-weight: 700;
+    border-color: var(--color-primary-blue);
+  }
+
+  .risk-cell-title {
+    display: block;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+  }
+
+  .risk-critical {
+    background: rgba(211, 47, 47, 0.1);
+    border-color: #d32f2f;
+    color: #b71c1c;
+  }
+
+  .risk-high {
+    background: rgba(245, 124, 0, 0.1);
+    border-color: #f57c00;
+    color: #e65100;
+  }
+
+  .risk-medium {
+    background: rgba(255, 152, 0, 0.1);
+    border-color: #ff9800;
+    color: #f57f17;
+  }
+
+  .risk-low {
+    background: rgba(56, 142, 60, 0.1);
+    border-color: #388e3c;
+    color: #1b5e20;
+  }
+</style>

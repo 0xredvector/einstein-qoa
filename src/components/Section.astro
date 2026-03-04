@@ -1,0 +1,29 @@
+---
+interface Props {
+  id?: string;
+  number?: string;
+  title: string;
+}
+const { id, number, title } = Astro.props;
+const displayTitle = number ? `${number}. ${title}` : title;
+---
+
+<section id={id}>
+  <h2>{displayTitle}</h2>
+  <slot />
+</section>
+
+<style>
+  section {
+    margin: 2.5rem 0;
+  }
+
+  h2 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--color-primary-blue);
+    margin: 1.5rem 0 1rem 0;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid var(--color-accent-blue);
+  }
+</style>

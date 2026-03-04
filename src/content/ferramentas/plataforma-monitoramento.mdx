@@ -1,0 +1,162 @@
+---
+title: "Plataforma de Monitoramento Centralizada"
+description: "Documentação da plataforma centralizada de monitoramento e alertas para todos os serviços da organização"
+date: 2026-02-10
+type: "tool"
+category: "monitoramento"
+tags: ["monitoramento", "alertas", "dashboards", "observabilidade"]
+status: "published"
+author: "Time de Observabilidade"
+url: "https://monitoring.einstein.internal"
+maturityLevel: 5
+---
+
+## Introdução
+
+A Plataforma de Monitoramento Centralizada da Einstein é a solução unificada para coleta, armazenamento, visualização e alerting de métricas, logs e traces de todos os serviços em produção. Construída com Prometheus, Grafana, Loki e Jaeger, oferece capacidades de observabilidade em escala corporativa.
+
+## Acessando a Plataforma
+
+### Primeiros Passos
+
+1. Acesse https://monitoring.einstein.internal
+2. Faça login usando suas credenciais corporativas (SSO LDAP)
+3. Você será direcionado para o dashboard pessoal
+4. Selecione seus serviços de interesse no painel esquerdo
+
+A plataforma suporta acesso via navegador em Chrome, Firefox, Safari (versão 2024+). Para API programática, use token de autenticação gerado em Configurações > API Tokens.
+
+### Permissões
+
+Por padrão, você tem acesso a:
+- Dashboards públicos de toda a organização
+- Dashboards e alertas de equipes que você participa
+- Seus próprios dashboards pessoais
+
+Para acessar dashboards de outras equipes, solicite ao gestor de acesso via canal #monitoramento no Slack.
+
+## Dashboard Principal
+
+O dashboard principal oferece visão consolidada:
+
+- **Cards de Saúde**: Status de todos os serviços em produção (verde/amarelo/vermelho)
+- **Gráficos de Tendências**: Taxa de requisições, latência e taxa de erro ao longo do tempo
+- **Top 10 Serviços**: Ranking por maior taxa de erro ou latência
+- **Alertas Ativos**: Alertas disparados nos últimos 7 dias
+- **Feed de Deployments**: Deploys recentes com correlação a mudanças de métricas
+
+## Criando Dashboards Personalizados
+
+### Novo Dashboard
+
+1. Clique em "+" na barra superior
+2. Selecione "Dashboard"
+3. Nomeie com padrão: `[equipe]-[propósito]`
+4. Salve o dashboard
+
+### Adicionando Gráficos
+
+1. Clique em "Adicionar Painel"
+2. Selecione tipo: Gráfico, Tabela, Gauge, Heatmap
+3. Escolha métrica desejada na lista
+4. Configure timerange, agregações e legendas
+5. Salve o painel
+
+Exemplo de query Prometheus para latência:
+
+```promql
+histogram_quantile(0.99, rate(http_request_duration_seconds_bucket{service="api-usuarios"}[5m]))
+```
+
+Para logs estruturados, use LogQL (sintaxe Loki):
+
+```
+{service="api-usuarios"} | json | level="ERROR"
+```
+
+## Configurando Alertas
+
+### Criar Regra de Alerta
+
+1. Vá em Alerting > Regras
+2. Clique "Nova Regra"
+3. Configure condição: métrica, operador, threshold
+4. Configure duração (ex: alerta dispara após 5 minutos acima do limite)
+5. Selecione canais de notificação (Slack, email, PagerDuty)
+6. Adicione anotações com runbook e contexto
+
+Exemplo de regra para taxa de erro:
+
+```
+Alert: HighErrorRate
+Condição: rate(http_requests_total{status=~"5.."}[5m]) > 0.005
+Duração: 5m
+Notificações: slack:#alertas-api, pagerduty:escalacao-sre
+Mensagem: "{{ $labels.service }} com taxa de erro {{ $value | humanizePercentage }}"
+```
+
+## Explorando Traces
+
+A plataforma integra Jaeger para rastreamento distribuído:
+
+1. Vá em "Traces" na navegação principal
+2. Filtre por service, operation, trace_id ou span_id
+3. Visualize waterfall com latência de cada serviço
+4. Identifique gargalos em cadeias de chamadas
+
+Use correlação com log trace_id para investigar incidentes.
+
+## Buscando Logs
+
+Acesse Loki para buscar logs estruturados:
+
+1. Vá em "Logs" > "Explorar"
+2. Selecione filtros: service, environment, level
+3. Busque por padrão: `{service="api-usuarios"} | json status_code="500"`
+4. Analise distribuição temporal com histograma
+
+Retenção de logs:
+- **Produção**: 30 dias (todos os logs)
+- **Staging**: 7 dias
+- **Development**: 24 horas
+
+## Recursos Avançados
+
+### Variáveis de Dashboard
+
+Dashboards suportam variáveis para reuso:
+
+```
+$service -> Dropdown com lista de serviços
+$timerange -> Intervalo de tempo selecionável
+$environment -> Filtro prod/staging/dev
+```
+
+### Notificações Inteligentes
+
+Configure escalation automática:
+- Nível 1: Slack no canal do time
+- Nível 2: PagerDuty (após 15 minutos não reconhecido)
+- Nível 3: Manager on-call (após 30 minutos)
+
+### API de Métricas
+
+Integre dados em aplicações externas:
+
+```bash
+curl -H "Authorization: Bearer $TOKEN" \
+  'https://monitoring.einstein.internal/api/v1/query?query=up{service="api-usuarios"}'
+```
+
+## Troubleshooting
+
+**Pergunta**: Por que meu dashboard está vazio?
+**Resposta**: Verifique se o serviço está enviando métricas. Acesse https://monitoring.einstein.internal/targets para validar scrapes.
+
+**Pergunta**: Como exportar dados para análise?
+**Resposta**: Use API Prometheus ou configure export para S3 via menu Configurações.
+
+**Pergunta**: Posso criar alertas programaticamente?
+**Resposta**: Sim, use Terraform para gerenciar alertas como código. Template disponível em git.
+
+Para suporte, contacte o time de observabilidade via #monitoramento ou observabilidade@einstein.internal.

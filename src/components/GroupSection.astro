@@ -1,0 +1,88 @@
+---
+interface Props {
+  icon?: string;
+  title: string;
+  question?: string;
+  variant?: 'identity' | 'ownership' | 'classification' | 'integration' | 'security';
+}
+const { icon, title, question, variant = 'identity' } = Astro.props;
+---
+
+<div class={`group-header group-${variant}`}>
+  {icon && <div class="group-icon">{icon}</div>}
+  <div>
+    <strong>{title}</strong>
+    {question && <div class="group-question">{question}</div>}
+  </div>
+</div>
+<div class="group-body">
+  <slot />
+</div>
+
+<style>
+  .group-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1rem 1.5rem;
+    border-left: 4px solid;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    border-radius: var(--border-radius-base);
+  }
+
+  .group-icon {
+    font-size: 1.75rem;
+    flex-shrink: 0;
+  }
+
+  .group-header strong {
+    display: block;
+    font-size: 1.1rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .group-question {
+    font-size: 0.9rem;
+    opacity: 0.8;
+    margin-top: 0.25rem;
+  }
+
+  .group-body {
+    padding: 1.5rem;
+    background: #f9f9f9;
+    border-radius: var(--border-radius-base);
+    margin-bottom: 1.5rem;
+  }
+
+  /* Variants */
+  .group-identity {
+    background: rgba(63, 81, 181, 0.08);
+    border-color: #3f51b5;
+    color: #1a237e;
+  }
+
+  .group-ownership {
+    background: rgba(0, 150, 210, 0.08);
+    border-color: #0096d2;
+    color: #004d73;
+  }
+
+  .group-classification {
+    background: rgba(245, 124, 0, 0.08);
+    border-color: #f57c00;
+    color: #e65100;
+  }
+
+  .group-integration {
+    background: rgba(56, 142, 60, 0.08);
+    border-color: #388e3c;
+    color: #1b5e20;
+  }
+
+  .group-security {
+    background: rgba(211, 47, 47, 0.08);
+    border-color: #d32f2f;
+    color: #b71c1c;
+  }
+</style>
